@@ -1,2 +1,10 @@
 node_modules
+<<<<<<< Updated upstream
 .env
+=======
+<<<<<<< HEAD
+.env
+=======
+.env
+>>>>>>> fet/dbConnenction
+>>>>>>> Stashed changes
