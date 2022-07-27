@@ -7,8 +7,9 @@ const app = express();
 
 const productsRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+const mongoProductRoutes = require('./api/routes/mongoProduct');
 
-const pool = require('./config/dbconnection');
+// const  = require('./config/dbconnection');
 
 
 
@@ -31,6 +32,7 @@ app.use((request, response, next) => {
 // Middleware of handling the routes of products
 app.use('/products', productsRoutes);
 app.use('/orders', orderRoutes);
+app.use('/mongoProduct', mongoProductRoutes);
 
 // Hadling the error of the routes of products
 app.use((request, response, next) => {
