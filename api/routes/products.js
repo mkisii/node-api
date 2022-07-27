@@ -1,12 +1,17 @@
 const express = require('express');
+const shopDB = require('../../config/dbconnection');
 
 
 const router = express.Router();
 
-router.get('/', (request, response, next) => {
-    response.status(200).json({
-        message: 'Handling GET requests for /products'
-    });
+router.get('/', async (request, response, next) => {
+    try {
+        let result = await shopDB.all();
+        response.json(result);
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({});
+    }
 
 });
 
@@ -26,21 +31,24 @@ router.post('/', (request, response, next) => {
 
 });
 
-router.get('/:productId', (request, response, next) => {
-    const id = request.params.productId;
-    if (id === 'item1') {
-        response.status(200).json({
-            message: "This is the of the Fiirst item in Product list",
-            id: id
-        })
+router.get('/:productId', async (request, response, next) => {
+    // const id = request.params.productId;
+    try {
 
-    } else {
-        response.status(200).json({
-            message: "The id does not exist in the Product list",
-        });
+        let result = await shopDB.one(request.params.productId)
+        if (result) {
+            response.json(result);
+        } else {
+            response.status(404).json({
+                message: 'Product not found'
+            });
+        }
 
-
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({});
     }
+
 });
 
 router.patch('/:productId', (request, response, next) => {
@@ -50,10 +58,22 @@ router.patch('/:productId', (request, response, next) => {
 
 });
 
-router.delete('/:productId', (request, response, next) => {
-    response.status(200).json({
-        message: 'Delete Product'
-    });
+router.delete('/:productId', async (request, response, next) => {
+    try {
+
+        let result = await shopDB.delete(request.params.productId)
+        if (result) {
+            response.json(result);
+        } else {
+            response.status(404).json({
+                message: 'Product not found'
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({});
+    }
 
 });
 
