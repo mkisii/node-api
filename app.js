@@ -1,28 +1,21 @@
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+
 
 const app = express();
 
 const productsRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 
-mongoose.connect(
-    'mongodb+srv://ondimu:' +
-    process.env.MONGO_ATLS_PWD +
-    '@node-api-test.cjek4.mongodb.net/?retryWrites=true&w=majority',
-    {
-        useMongoClient: true,
-    }
-);
+
 
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app, use((request, response, next) => {
+app.use((request, response, next) => {
     response.header('Access-Control-Allow-Origin', '*');
     response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     if (request.method === 'OPTIONS') {
