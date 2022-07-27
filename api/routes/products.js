@@ -1,79 +1,92 @@
 const express = require('express');
-const shopDB = require('../../config/dbconnection');
+const connection = require('../../config/dbconnection');
 
 
 const router = express.Router();
 
-router.get('/', async (request, response, next) => {
-    try {
-        let result = await shopDB.all();
-        response.json(result);
-    } catch (error) {
-        console.log(error);
-        response.status(500).json({});
-    }
+// Read/listing all products in the database
+router.get('/read', async (request, response, next) => {
+    const query = 'SELECT * FROM products';
+    connection.query(query, (err, results) => {
+        if (!err) {
+            return response.status(200).json(results);
+        } else {
+            return response.status(500).json(err);
+        }
+    });
+});
+
+// Creating the prodcuts
+router.post('/create', (request, response, next) => {
+
+    const product = request.body;
+
+    const query = "insert into products (product_name,description, price, weigth) values (?, ?, ?, ?)";
+    connection.query(query, [product.product_name, product.description, product.price, product.weigth], (err, result) => {
+        if (!err) {
+            response.status(201).json({
+                message: "Product created successfully"
+            });
+
+        } else
+            return response.status(500).json(err);
+
+    });
+
 
 });
 
-router.post('/', (request, response, next) => {
-    const product = {
-        name: request.body.name,
-        price: request.body.price,
-        description: request.body.description,
-        type: request.body.type
+router.get('/read/:productId', async (request, response, next) => {
+    const productId = request.params.productId;
+    const query = 'SELECT * FROM products where product_id = ?';
+    connection.query(query, [productId], (err, results) => {
+        if (!err) {
+            return response.status(200).json(results);
+        } else {
+            return response.status(500).json(err);
+        }
+    });
 
-    }
-    response.status(201).json({
-        message: 'Handling POST requests for /products',
-        createdProduct: product
+
+});
+
+// Update the products
+router.patch('/update/:productId', (request, response, next) => {
+    const productId = request.params.productId;
+    const product = request.body;
+    const query = "update products set product_name = ?, description = ?, price = ?, weigth = ? where product_id = ?";
+    connection.query(query, [product.product_name, product.description, product.price, product.weigth, productId], (err, result) => {
+        if (!err) {
+            if (result.affectedRows === 0) {
+                return response.status(404).json({
+                    message: "Product ID not found"
+                });
+            }
+            response.status(200).json({
+                message: "Product updated successfully"
+            });
+        }
 
     });
 
 });
 
-router.get('/:productId', async (request, response, next) => {
-    // const id = request.params.productId;
-    try {
-
-        let result = await shopDB.one(request.params.productId)
-        if (result) {
-            response.json(result);
-        } else {
-            response.status(404).json({
-                message: 'Product not found'
+router.delete('/delete/:productId', async (request, response, next) => {
+    const productId = request.params.productId;
+    const query = 'DELETE FROM products where product_id = ?';
+    connection.query(query, [productId], (err, results) => {
+        if (!err) {
+            if (results.affectedRows === 0) {
+                return response.status(404).json({
+                    message: "Product ID not found"
+                });
+            }
+            response.status(200).json({
+                message: "Product deleted successfully"
             });
         }
 
-    } catch (error) {
-        console.log(error);
-        response.status(500).json({});
-    }
-
-});
-
-router.patch('/:productId', (request, response, next) => {
-    response.status(201).json({
-        message: 'Updated Product'
     });
-
-});
-
-router.delete('/:productId', async (request, response, next) => {
-    try {
-
-        let result = await shopDB.delete(request.params.productId)
-        if (result) {
-            response.json(result);
-        } else {
-            response.status(404).json({
-                message: 'Product not found'
-            });
-        }
-
-    } catch (error) {
-        console.log(error);
-        response.status(500).json({});
-    }
 
 });
 

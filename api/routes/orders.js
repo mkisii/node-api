@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const connection = require('../../config/dbconnection');
 
 router.get('/', (request, response, next) => {
     response.status(200).json({
@@ -7,15 +8,20 @@ router.get('/', (request, response, next) => {
     });
 });
 
-router.post('/', (request, response, next) => {
-    const order = {
-        productId: request.body.productId,
-        quantity: request.body.quantity
+router.post('/create', (request, response, next) => {
 
-    }
-    response.status(201).json({
-        message: 'Create Order',
-        orderCreated: order
+    const order = request.body;
+
+    const query = "insert into orders (productID,quantity) values (?, ?)";
+    connection.query(query, [order.productID, order.quantity], (err, result) => {
+        if (!err) {
+            response.status(201).json({
+                message: "Order created successfully"
+            });
+
+        } else
+            return response.status(500).json(err);
+
     });
 });
 
