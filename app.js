@@ -8,6 +8,8 @@ const app = express();
 const productsRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 
+const pool = require('./config/dbconnection');
+
 
 
 
